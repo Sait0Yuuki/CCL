@@ -3,7 +3,8 @@
 #include <thread>
 using namespace std;
 
-int board[9][9] = {
+int board[9][9];
+/* = {
     {0, 0, 5, 3, 0, 0, 0, 0, 0},
     {8, 0, 0, 0, 0, 0, 0, 2, 0},
     {0, 7, 0, 0, 1, 0, 5, 0, 0},
@@ -12,7 +13,7 @@ int board[9][9] = {
     {0, 0, 3, 2, 0, 0, 0, 8, 0},
     {0, 6, 0, 5, 0, 0, 0, 0, 9},
     {0, 0, 4, 0, 0, 0, 0, 3, 0},
-    {0, 0, 0, 0, 0, 9, 7, 0, 0}};
+    {0, 0, 0, 0, 0, 9, 7, 0, 0}};*/
 
 bool check(int i, int j, char val)
 {
@@ -67,5 +68,15 @@ void solveSudoku(int i, int j)
 
 int main()
 {
+    char puzzle[128];
+    FILE* fp = fopen("Hello.txt", "r");
+    fgets(puzzle, sizeof puzzle, fp);
+    int count=0;
+    for(int i = 0;i < 9;i++)
+        for(int j = 0;j < 9;j++)
+           {
+                board[i][j]=puzzle[count]-'0';
+                count++;
+           }
     solveSudoku(0, 0);
 }
