@@ -1,9 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <strings.h>
-
 #include "sudoku.h"
-
 #include <algorithm>
 
 int neighbors[N][NEIGHBOR];

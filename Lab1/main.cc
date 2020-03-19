@@ -5,6 +5,7 @@
 #include <sys/time.h>
 
 #include "sudoku.h"
+#include "ThreadPool.h"
 
 int64_t now()
 {
@@ -13,35 +14,32 @@ int64_t now()
   return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
+
 int main(int argc, char* argv[])
 {
   init_neighbors();
-
   FILE* fp = fopen(argv[1], "r");
   char puzzle[128];
   int total_solved = 0;
   int total = 0;
-  bool (*solve)(int) = solve_sudoku_dancing_links; 
-  int64_t start = now();
+  //int64_t start = now();
   while (fgets(puzzle, sizeof puzzle, fp) != NULL) {
     if (strlen(puzzle) >= N) {
       ++total;
       input(puzzle);
-      if (solve(0)) {
-        ++total_solved;
-        output();
-        if (!solved())
-          assert(0);
       }
       else {
         printf("No: %s", puzzle);
       }
-    }
   }
-  int64_t end = now();
-  double sec = (end-start)/1000000.0;
-  printf("%f sec %f ms each %d\n", sec, 1000*sec/total, total_solved);
-
+  
+  ThreadPool pool(THREADNUM);
+  while(!puzzleSet.empty()){
+    pool.enqueue(solveSudoku);
+  }
+  //int64_t end = now();
+  //double sec = (end-start)/1000000.0;
+  //printf("%f sec %f ms each %d\n", sec, 1000*sec/total, total_solved);
   return 0;
 }
 
