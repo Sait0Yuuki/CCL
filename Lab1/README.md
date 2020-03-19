@@ -5,7 +5,7 @@ https://github.com/progschj/ThreadPool
 
 ThreadPool demo: `make demo`
 sudoku: `make` or `make sudoku`
-`make clean`
+clean: `make clean`
 
 ## 1. Overview
 
