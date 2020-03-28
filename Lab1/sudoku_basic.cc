@@ -24,13 +24,14 @@ void solveSudoku()
     puzzleSet.pop();
   }
   else return ;
-  pthread_mutex_unlock(&queue_mutex);
   if (solve(0))
   {
     output();
     //if (!solved())
       //assert(0);
   }
+  pthread_mutex_unlock(&queue_mutex);
+
 }
 
 void output()

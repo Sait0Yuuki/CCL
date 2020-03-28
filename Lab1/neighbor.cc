@@ -61,7 +61,7 @@ static void print_neighbors(const bool adjacent[ROW][COL], int row, int col, int
   for (int row = 0; row < ROW; ++row) {
     for (int col = 0; col < COL; ++col) {
       bool adjacent[ROW][COL];
-      bzero(adjacent, sizeof adjacent);
+      bzero(adjacent,sizeof adjacent);
       mark_adjacent(adjacent, row, col);
 
       int me = row*COL + col;

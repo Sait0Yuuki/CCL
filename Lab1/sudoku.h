@@ -2,7 +2,7 @@
 #ifndef SUDOKU_H
 #define SUDOKU_H
 
-#define THREADNUM 8
+#define THREADNUM 10
 
 const bool DEBUG_MODE = false;
 enum { ROW=9, COL=9, N = 81, NEIGHBOR = 20 };

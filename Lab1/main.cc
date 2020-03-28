@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
   while(!puzzleSet.empty()){
     pool.enqueue(solveSudoku);
   }
+  //exit(1);
   //int64_t end = now();
   //double sec = (end-start)/1000000.0;
   //printf("%f sec %f ms each %d\n", sec, 1000*sec/total, total_solved);
