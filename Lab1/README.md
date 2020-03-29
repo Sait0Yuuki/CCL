@@ -1,12 +1,11 @@
 # Lab 1: “Super-fast” Sudoku Solving
 
-Enter in the folder you have cloned from our lab git repo, and pull the latest commit. 
+## Reference
+https://github.com/progschj/ThreadPool
 
-`git pull`
-
-You can find this lab1's instruction in `Lab1/README.md` 
-
-All materials of lab1 are in folder `Lab1/`
+ThreadPool demo: `make demo`
+sudoku: `make` or `make sudoku`
+clean: `make clean`
 
 ## 1. Overview
 
