@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include <pthread.h>
+#include <thread>
 #include <string.h>
 #include <iostream>
 
@@ -24,19 +25,21 @@ void solveSudoku()
     puzzleSet.pop();
   }
   else return ;
+  pthread_mutex_unlock(&queue_mutex);
   if (solve(0))
   {
     output();
     //if (!solved())
       //assert(0);
   }
-  pthread_mutex_unlock(&queue_mutex);
-
+  return ;
 }
 
 void output()
 {
   pthread_mutex_lock(&output_mutex);
+  std::cout<<  std::this_thread::get_id()<<std::endl;
+  std::cout<< puzzleSet.size() <<std::endl;
   for(int i=0;i<N;i++) printf("%d",board[i]);
   printf("\n");
   pthread_mutex_unlock(&output_mutex);
@@ -44,11 +47,12 @@ void output()
 
 void input(const char in[N])
 {
-  std::vector<int> tmp;
-  for (int cell = 0; cell < N; ++cell) {
-    tmp.push_back(in[cell] - '0');
-    assert(0 <= tmp[cell] && tmp[cell] <= NUM);
-  }
-  puzzleSet.push(tmp);
-  //std::cout<<puzzleSet.size()<<std::endl;
+	std::vector<int> tmp;
+	for (int cell = 0; cell < N; ++cell)
+	{
+		tmp.push_back(in[cell] - '0');
+		assert(0 <= tmp[cell] && tmp[cell] <= NUM);
+	}
+	puzzleSet.push(tmp);
+	//std::cout<<puzzleSet.size()<<std::endl;
 }

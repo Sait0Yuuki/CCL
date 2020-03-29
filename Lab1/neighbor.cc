@@ -4,7 +4,7 @@
 #include "sudoku.h"
 #include <algorithm>
 
-int neighbors[N][NEIGHBOR];
+__thread int neighbors[N][NEIGHBOR];
 
 static void mark_adjacent(bool adjacent[ROW][COL], int row, int col)
 {

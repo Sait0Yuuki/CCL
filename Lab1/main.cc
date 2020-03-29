@@ -2,8 +2,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/time.h>
-
+#include <iostream>
 #include "sudoku.h"
 #include "ThreadPool.h"
 
@@ -18,13 +19,20 @@ int64_t now()
 int main(int argc, char* argv[])
 {
   init_neighbors();
-  FILE* fp = fopen(argv[1], "r");
+  FILE* fp[argc];
+  //fp[0] = fopen(argv[1], "r");
   char puzzle[128];
+  for(int i=0;i<argc;i++)
+  {
+    fp[i] = fopen(argv[i+1], "r");
+  }
   int total_solved = 0;
   int total = 0;
   //int64_t start = now();
-  while (fgets(puzzle, sizeof puzzle, fp) != NULL) {
-    if (strlen(puzzle) >= N) {
+  for(int i=0;i<argc;i++)
+  {
+     while (fgets(puzzle, sizeof puzzle, fp[i]) != NULL) {
+      if (strlen(puzzle) >= N) {
       ++total;
       input(puzzle);
       }
@@ -32,10 +40,12 @@ int main(int argc, char* argv[])
         printf("No: %s", puzzle);
       }
   }
+  }
   
   ThreadPool pool(THREADNUM);
-  while(!puzzleSet.empty()){
+  while(puzzleSet.size()!=0){
     pool.enqueue(solveSudoku);
+    usleep(1000); //sleep to avoid dead loop
   }
   //exit(1);
   //int64_t end = now();

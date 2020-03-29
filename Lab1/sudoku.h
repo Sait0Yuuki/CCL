@@ -2,13 +2,13 @@
 #ifndef SUDOKU_H
 #define SUDOKU_H
 
-#define THREADNUM 10
+#define THREADNUM 4
 
 const bool DEBUG_MODE = false;
 enum { ROW=9, COL=9, N = 81, NEIGHBOR = 20 };
 const int NUM = 9;
 
-extern int neighbors[N][NEIGHBOR];
+extern __thread int neighbors[N][NEIGHBOR];
 extern __thread int board[N]; 
 extern int spaces[N];
 extern int nspaces;
