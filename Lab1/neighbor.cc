@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include <strings.h>
+#include <string.h>
 #include "sudoku.h"
 #include <algorithm>
-
 __thread int neighbors[N][NEIGHBOR];
 
 static void mark_adjacent(bool adjacent[ROW][COL], int row, int col)
@@ -61,7 +61,7 @@ static void print_neighbors(const bool adjacent[ROW][COL], int row, int col, int
   for (int row = 0; row < ROW; ++row) {
     for (int col = 0; col < COL; ++col) {
       bool adjacent[ROW][COL];
-      bzero(adjacent,sizeof adjacent);
+      memset(adjacent,0,sizeof adjacent);
       mark_adjacent(adjacent, row, col);
 
       int me = row*COL + col;

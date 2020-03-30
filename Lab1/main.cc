@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
     usleep(1000); //sleep to avoid dead loop
   }
   output();
+
   //exit(1);
   //int64_t end = now();
   //double sec = (end-start)/1000000.0;
