@@ -19,22 +19,19 @@ int64_t now()
 int main(int argc, char* argv[])
 {
   init_neighbors();
-  FILE* fp[argc];
+  FILE* fp;
   //fp[0] = fopen(argv[1], "r");
   char puzzle[128];
-  for(int i=0;i<argc;i++)
-  {
-    fp[i] = fopen(argv[i+1], "r");
-  }
+  
   int total_solved = 0;
   int total = 0;
   //int64_t start = now();
-  for(int i=0;i<argc;i++)
+  for(int i=1;i<argc;i++)
   {
-     while (fgets(puzzle, sizeof puzzle, fp[i]) != NULL) {
+     fp = fopen(argv[i], "rw");
+     while (fgets(puzzle, sizeof puzzle, fp) != NULL) {
       if (strlen(puzzle) >= N) {
-      ++total;
-      input(puzzle);
+      input(puzzle,total++);
       }
       else {
         printf("No: %s", puzzle);
@@ -43,10 +40,12 @@ int main(int argc, char* argv[])
   }
   
   ThreadPool pool(THREADNUM);
-  while(puzzleSet.size()!=0){
+  it=puzzleSet.begin();
+  while(it!=puzzleSet.end()){
     pool.enqueue(solveSudoku);
     usleep(1000); //sleep to avoid dead loop
   }
+  output();
   //exit(1);
   //int64_t end = now();
   //double sec = (end-start)/1000000.0;

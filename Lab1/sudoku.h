@@ -1,4 +1,7 @@
-#include<queue>
+#include <queue>
+#include <atomic>
+#include <map>
+
 #ifndef SUDOKU_H
 #define SUDOKU_H
 
@@ -13,12 +16,13 @@ extern __thread int board[N];
 extern int spaces[N];
 extern int nspaces;
 extern int (*chess)[COL];
-extern std::queue<std::vector<int>> puzzleSet; 
+extern std::map<int,std::vector<int>> puzzleSet;
+extern std::map<int,std::vector<int>>::iterator it;
 
 void solveSudoku();
 
 void init_neighbors();
-void input(const char in[N]);
+void input(const char in[N],int i);
 void init_cache();
 void output();
 
