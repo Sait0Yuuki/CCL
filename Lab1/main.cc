@@ -8,13 +8,6 @@
 #include "sudoku.h"
 #include "ThreadPool.h"
 
-int64_t now()
-{
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return tv.tv_sec * 1000000 + tv.tv_usec;
-}
-
 int main(int argc, char *argv[])
 {
 	init_neighbors();
@@ -34,10 +27,6 @@ int main(int argc, char *argv[])
 			{
 				input(puzzle, total++);
 			}
-			else
-			{
-				printf("No: %s", puzzle);
-			}
 		}
 	}
 
@@ -50,13 +39,10 @@ int main(int argc, char *argv[])
 		pool.enqueue(solveSudoku);
 		usleep(1000); //sleep to avoid dead loop
 	}
-	output();
 	duration<double> diff = system_clock::now() - start;
-	std::cout << "Run: " << diff.count() << "s.\n";
 
-	//exit(1);
-	//int64_t end = now();
-	//double sec = (end-start)/1000000.0;
-	//printf("%f sec %f ms each %d\n", sec, 1000*sec/total, total_solved);
+	output();
+	
+	std::cout <<"Thread Num: "<<THREADNUM<< " Runtime: " << diff.count() << "s.\n";
 	return 0;
 }
