@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 	while (it != puzzleSet.end())
 	{
 		pool.enqueue(solveSudoku);
-		usleep(1000); //sleep to avoid dead loop
+		usleep(100); //sleep to avoid dead loop
 	}
 	duration<double> diff = system_clock::now() - start;
 
