@@ -17,7 +17,19 @@ int main(int argc, char *argv[])
 
 	int total_solved = 0;
 	int total = 0;
-	//int64_t start = now();
+
+	std::string file_name_str = "";
+	std::cin>>file_name_str;
+	file_name_str.erase(0,2);
+	fp = fopen(file_name_str.c_str(), "rw");
+	while (fgets(puzzle, sizeof puzzle, fp) != NULL)
+	{
+		if (strlen(puzzle) >= N)
+		{
+			input(puzzle, total++);
+		}
+	}
+
 	for (int i = 1; i < argc; i++)
 	{
 		fp = fopen(argv[i], "rw");
