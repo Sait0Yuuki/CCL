@@ -7,6 +7,23 @@ ThreadPool demo: `make demo`
 sudoku: `make` or `make sudoku`
 clean: `make clean`
 
+
+
+## 使用方法
+
+make完毕输入./sudoku_sovle后输入想解决的文件
+
+回车输入下一个文件的文件名，如需结束输入文件，只需按两下回车
+
+例:
+
+./sudoku_solve 
+test1
+test10
+test100
+
+输入完毕会显示：stop reading the file,please wait
+
 ## 1. Overview
 
 Implement a Sudoku solving program, using multiple threads or multiple processes, running on a single machine. Try to **utilize all your CPU cores** and make your program **run as fast as possible**! 

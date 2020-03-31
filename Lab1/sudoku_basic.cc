@@ -15,7 +15,6 @@ __thread int board[N]; //使用__thread变量使每个线程有一份独立的bo
 //std::queue<std::vector<int>> puzzleSet;
 std::map<int, std::vector<int>> puzzleSet;
 map<int, std::vector<int>>::iterator it;
-map<int, std::vector<int>>::iterator ite;
 int (*chess)[COL] = (int (*)[COL])board;
 
 void solveSudoku()
@@ -50,15 +49,15 @@ void solveSudoku()
 void output()
 {
 	pthread_mutex_lock(&output_mutex);
-	ite = puzzleSet.begin();
-	while (ite != puzzleSet.end())
+	it = puzzleSet.begin();
+	while (it != puzzleSet.end())
 	{
-		// cout << ite->first << endl;
-		vector<int> tmp = ite->second;
+		// cout << it->first << endl;
+		vector<int> tmp = it->second;
 		for (int i = 0; i < 81; i++)
 			cout << tmp[i];
 		cout << endl;
-		ite++;
+		it++;
 	}
 	pthread_mutex_unlock(&output_mutex);
 }
