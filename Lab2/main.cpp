@@ -24,7 +24,8 @@ int main(int argc,char *argv[])
     struct sockaddr_in sever_address;
     bzero(&sever_address,sizeof(sever_address));    //清零
     sever_address.sin_family = AF_INET; 
-    sever_address.sin_addr.s_addr = htons(INADDR_ANY);  //sin_addr存储IP地址，使用in_addr这个数据结构；s_addr按照网络字节顺序存储IP地址
+    sever_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    // sever_address.sin_addr.s_addr = htons(INADDR_ANY);  //sin_addr存储IP地址，使用in_addr这个数据结构；s_addr按照网络字节顺序存储IP地址
     sever_address.sin_port = htons(8888);   //端口号
  
     socketfd = socket(AF_INET,SOCK_STREAM,0);   //建立TCP socket
