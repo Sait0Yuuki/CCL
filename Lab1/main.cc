@@ -10,38 +10,44 @@
 
 int main(int argc, char *argv[])
 {
+	ThreadPool inputpool(THREADNUM);
 	init_neighbors();
-	FILE *fp;
+	//FILE *fp;
 	//fp[0] = fopen(argv[1], "r");
 	char puzzle[128];
 
 	int total_solved = 0;
 	int total = 0;
-
-	std::string file_name_str = "";
-	std::cin>>file_name_str;
-	file_name_str.erase(0,2);
-	fp = fopen(file_name_str.c_str(), "rw");
-	while (fgets(puzzle, sizeof puzzle, fp) != NULL)
-	{
-		if (strlen(puzzle) >= N)
-		{
-			input(puzzle, total++);
+    char *FileName=(char*)malloc(256*sizeof(char));
+	FILE *fp;
+	while(fgets(FileName, 256, stdin)) {
+        if(FileName[0]=='\n') {
+			printf("stop reading the file,please wait\n");
+			break;
 		}
-	}
+        if(FileName[strlen(FileName)-1]=='\n')
+			FileName[strlen(FileName)-1]='\0';
 
-	for (int i = 1; i < argc; i++)
-	{
-		fp = fopen(argv[i], "rw");
-		while (fgets(puzzle, sizeof puzzle, fp) != NULL)
-		{
-			if (strlen(puzzle) >= N)
+		fp = fopen(FileName, "r");
+
+		if(fp==NULL) {
+			printf("%s dose not have data\n",FileName);
+			continue;
+		}
+
+			// std::string FileName_str = "";
+			// std::cin>>FileName_str;
+			// FileName_str.erase(0,2);
+			// fp = fopen(FileName_str.c_str(), "rw");
+			while (fgets(puzzle, sizeof puzzle, fp) != NULL)
 			{
-				input(puzzle, total++);
+				if (strlen(puzzle) >= N)
+				{
+				//	inputpool.enqueue(input(puzzle,total++));
+			     	input(puzzle, total++);
+				}
 			}
-		}
-	}
-
+	    }
 	using namespace std::chrono;
 	auto start = system_clock::now();
 	ThreadPool pool(THREADNUM);
