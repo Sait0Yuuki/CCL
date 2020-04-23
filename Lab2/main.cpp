@@ -10,35 +10,41 @@
 #include<assert.h>
 #include<unistd.h>
 #include<string.h>
+#include <errno.h>
 
-const int port = 8888;
-int main(int argc,char *argv[])
+int server_port;
+
+void TCP_connect()
 {
-    if(argc < 0)
-    {
-        printf("./httpServer --ip ip_address --port port_number [--number-thread thread_number] \n");
-        exit(1);
-    }
     int socketfd;
     int connfd;
-    struct sockaddr_in sever_address;
-    bzero(&sever_address,sizeof(sever_address));    //清零
-    sever_address.sin_family = AF_INET; 
-    sever_address.sin_addr.s_addr = htons(INADDR_ANY);  //sin_addr存储IP地址，使用in_addr这个数据结构；s_addr按照网络字节顺序存储IP地址
-    sever_address.sin_port = htons(8888);   //端口号
- 
-    socketfd = socket(AF_INET,SOCK_STREAM,0);   //建立TCP socket
-    assert(socketfd>=0);
-    
-    //绑定
-    int ret = bind(socketfd, (struct sockaddr*)&sever_address,sizeof(sever_address));
-    assert(ret != -1);
- 
-    //监听
-    ret = listen(socketfd,1);
-    assert(ret != -1);
+    struct sockaddr_in server_address;
 
-    //这里可以开始创建线程了
+    socketfd = socket(AF_INET,SOCK_STREAM,0);   //建立TCP socket
+    if (socketfd == -1) {
+    perror("Failed to create a new socket");
+    exit(errno);
+    }
+
+    bzero(&server_address,sizeof(server_address));    //清零
+    server_address.sin_family = AF_INET; 
+    server_address.sin_addr.s_addr = htons(INADDR_ANY);  //sin_addr存储IP地址，使用in_addr这个数据结构；s_addr按照网络字节顺序存储IP地址
+    server_address.sin_port = htons(server_port);   //端口号
+ 
+
+    if (bind(socketfd, (struct sockaddr *) &server_address,
+        sizeof(server_address)) == -1) {
+        perror("Failed to bind on socket");
+        exit(errno);
+    }
+
+    if (listen(socketfd, 1024) == -1) 
+    {
+        perror("Failed to listen on socket");
+        exit(errno);
+    }
+
+    printf("Listening on port %d...\n",server_port);
 
     while(true)
     {
@@ -71,6 +77,35 @@ int main(int argc,char *argv[])
         }
     }
 	close(socketfd);
+
+}
+
+int main(int argc,char **argv)
+{
+    //默认参数s
+    server_port=8888;
+
+    if(argc < 0)
+    {
+        printf("./httpServer --ip ip_address --port port_number [--number-thread thread_number] \n");
+        exit(1);
+    }
+
+    for(int i=1;i<argc;i++)
+    {
+        if(strcmp("--port",argv[i])==0)  // --port
+        {
+            char *server_port_str=argv[++i];
+            if(!server_port_str){
+                fprintf(stderr, "Expected argument after --port\n");
+            }
+            server_port=atoi(server_port_str);
+        }
+        /*else if..*/
+    }
+
+    TCP_connect();
+
 	
     return 0;
 }
