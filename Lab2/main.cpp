@@ -59,21 +59,7 @@ void TCP_connect()
         }
         else
         {
-            char request[1024];
-            recv(connfd,request,1024,0);
-
-            // 返回请求的数据
-            request[strlen(request)+1]='\0';
-            printf("%s\n",request);
-
-            printf("successeful!\n");
-            char buf[520]="HTTP/1.1 200 ok\r\nconnection: close\r\n\r\n";//HTTP响应
-            int s = send(connfd,buf,strlen(buf),0);//发送响应
-            //printf("send=%d\n",s);
-            int fd = open("index.html",O_RDONLY);//消息体
-            sendfile(connfd,fd,NULL,2500);//零拷贝发送消息体
-            close(fd);
-            close(connfd);
+            http(connfd);
         }
     }
 	close(socketfd);
