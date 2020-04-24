@@ -11,8 +11,10 @@
 #include<unistd.h>
 #include<string.h>
 #include <errno.h>
+#include "httplib.h"
 
 int server_port;
+
 
 void TCP_connect()
 {
@@ -53,6 +55,9 @@ void TCP_connect()
         struct sockaddr_in client;
         socklen_t client_addrlength = sizeof(client);
         connfd = accept(socketfd, (struct sockaddr*)&client, &client_addrlength);   //返回连接套接字描述符
+
+        accept_request(connfd);
+
         if(connfd<0)    //该描述符不为0
         {
             perror("err connfd\n");
@@ -75,7 +80,8 @@ void TCP_connect()
             close(fd);
             close(connfd);
         }
-	close(socketfd);
+	    close(socketfd);
+    }
 
 }
 
