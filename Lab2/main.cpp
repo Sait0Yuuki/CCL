@@ -11,8 +11,31 @@
 #include<unistd.h>
 #include<string.h>
 #include <errno.h>
+#include <iostream>
+
+#include "httprequestparser.h"
+#include "request.h"
+using namespace httpparser;
 
 int server_port;
+
+void handle_request(char text[1024])
+{
+    Request request;
+    HttpRequestParser parser;
+    int length=strlen(text);
+
+    HttpRequestParser::ParseResult res = parser.parse(request, text, text + length);
+
+    if( res == HttpRequestParser::ParsingCompleted )
+    {
+        std::cout<<request.method<<std::endl;
+        std::cout<<request.uri<<std::endl;
+        //method(GET OR POST)
+        //uri(/,/Post_show)
+        //content(e.g. Name=HNU&ID=CS06142)
+    }
+}
 
 void TCP_connect()
 {
@@ -61,10 +84,9 @@ void TCP_connect()
         {
             char request[1024];
             recv(connfd,request,1024,0);
-
-            // 返回请求的数据
             request[strlen(request)+1]='\0';
-            printf("%s\n",request);
+
+            handle_request(request);
 
             printf("successeful!\n");
             char buf[520]="HTTP/1.1 200 ok\r\nconnection: close\r\n\r\n";//HTTP响应

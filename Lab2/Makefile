@@ -1,7 +1,7 @@
 all:httpServer
 
 CFLAGS = -O2 -pthread -lpthread
-SRC = main.cpp httplib.c
+SRC = main.cpp 
 
 httpServer: $(SRC)
 	g++ $(CFLAGS) $(SRC) -o httpserver
