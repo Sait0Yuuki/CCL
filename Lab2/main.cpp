@@ -48,6 +48,13 @@ void TCP_connect()
     perror("Failed to create a new socket");
     exit(errno);
     }
+	
+	int reuse = 1;
+    if(setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0)
+    {
+      perror("setsockopt error\n");
+      return -1;
+    }
 
     bzero(&server_address,sizeof(server_address));    //清零
     server_address.sin_family = AF_INET; 
