@@ -37,7 +37,7 @@ void http_get_method(int connfd)
     {
         printf("db db db: found file\n");
     }
-    
+
     struct stat f_stat;
     stat(path_tmp.c_str(), &f_stat);
     char buf[520]="HTTP/1.1 200 OK\r\n\r\n";//HTTP响应
