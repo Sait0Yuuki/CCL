@@ -27,23 +27,19 @@ void POST_method(int connfd, std::string rui)
 	
 }
 
-void NOTFOUND_method(int connfd) //404
-{
-    char code[]="HTTP/1.1 404 Not Found\r\n";
-	char Server[]="My Web Server\r\n";
-    char content_type[]="Content-type: text/html\r\n\r\n";
-    char end[]="\r\n\r\n";
-    char entity1[]="<html><title>404 Not Found</title><body bgcolor=ffffff>\n Not Found\n";
-    char file[]="<p>Could not find this file: \n";
-    char entity2[]="<hr><em>HTTP Web Server</em>\n</body></html>\n";
-    send(connfd,code,strlen(code),0);
-	send(connfd,Server,strlen(Server),0);
-    send(connfd,content_type,strlen(content_type),0);
-    send(connfd,entity1,strlen(entity1),0);
-    send(connfd,file,strlen(file),0);
-    send(connfd,entity2,strlen(entity2),0);
-    send(connfd,end,strlen(end),0);
-    close(connfd);
+void NOTFOUND_method(std::string method,std::string url,int fd){
+    std::string entity1="<html><title>404 Not Found</title><body bgcolor=ffffff>\n Not Found\n";
+    std::string file="<p>Could not find this file: "+url+"\n";
+    std::string entity2="<hr><em>HTTP Web Server</em>\n</body></html>\n";
+    std::string entity=entity1+file+entity2;
+    if(method=="POST"){
+        entity=entity1+entity2;
+    }
+    std::string str="HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: "+std::to_string(entity.length())+"\r\n\r\n";
+    std::string total=str+entity;
+    char buf[512];
+    sprintf(buf,"%s",total.c_str());
+    write(fd, buf, strlen(buf));
 }
 
 //获取文件类型
@@ -70,7 +66,7 @@ char *http_get_mime_type(char *file_name) {
   }
 }
 
-void GET_method(int connfd,std::string uri)
+void GET_method(std::string method,int connfd,std::string uri)
 {
     char *curi = new char[uri.length() + 1];
     strcpy(curi, uri.c_str());
@@ -81,7 +77,7 @@ void GET_method(int connfd,std::string uri)
     fd = open(curi,O_RDONLY);
     if(fd==-1) //找不到文件
     {
-        NOTFOUND_method(connfd);
+        NOTFOUND_method(method,uri,connfd);
     }
 
     //printf("send=%d\n",s);
@@ -152,9 +148,9 @@ void handle_request(int connfd)
         std::string uri=request.uri;
         if(method=="GET")
         {
-            GET_method(connfd,uri);
+            GET_method(method,connfd,uri);
         }
-        else if(method!="GET"&&method!="POSt")
+        else if(method!="GET"&&method!="POST")
         {
             NOT_Implemented(method,connfd);
         }
@@ -162,7 +158,7 @@ void handle_request(int connfd)
 		{
 			if(uri != "/Post_show")
 			{
-				NOTFOUND_method(connfd);
+				NOTFOUND_method(method,uri,connfd);
 			}
 			else
 			{
@@ -274,11 +270,7 @@ int main(int argc,char **argv)
         }
     }
 
-<<<<<<< HEAD
     TCP_connect(thread_num,ip_address);
-=======
-    TCP_connect();
 
->>>>>>> 88a0292d958836b934d80ff97ae2d088df8e7d10
     return 0;
 }
