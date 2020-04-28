@@ -1,15 +1,15 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<sys/socket.h>
-#include<sys/types.h>
-#include<sys/stat.h>
-#include<sys/sendfile.h>
-#include<fcntl.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
-#include<assert.h>
-#include<unistd.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <assert.h>
+#include <unistd.h>
+#include <string.h>
 #include <errno.h>
 #include <iostream>
 
@@ -22,15 +22,22 @@ int server_port;
 int thread_num;
 char *ip_address;
 
+void POST_method(int connfd, std::string rui)
+{
+	
+}
+
 void NOTFOUND_method(int connfd) //404
 {
     char code[]="HTTP/1.1 404 Not Found\r\n";
+	char Server[]="My Web Server\r\n";
     char content_type[]="Content-type: text/html\r\n\r\n";
     char end[]="\r\n\r\n";
     char entity1[]="<html><title>404 Not Found</title><body bgcolor=ffffff>\n Not Found\n";
     char file[]="<p>Could not find this file: \n";
     char entity2[]="<hr><em>HTTP Web Server</em>\n</body></html>\n";
     send(connfd,code,strlen(code),0);
+	send(connfd,Server,strlen(Server),0);
     send(connfd,content_type,strlen(content_type),0);
     send(connfd,entity1,strlen(entity1),0);
     send(connfd,file,strlen(file),0);
@@ -104,11 +111,11 @@ void GET_method(int connfd,std::string uri)
     send(connfd,end,strlen(end),0);
 
     sendfile(connfd,fd,NULL,2500);
-    
 
     close(fd);
     close(connfd);
 }
+
 void NOT_Implemented(std::string method,int fd)
 {
     std::string entity1="<html><title>501 Not Implemented</title><body bgcolor=ffffff>\n Not Implemented\n";
@@ -147,10 +154,22 @@ void handle_request(int connfd)
         {
             GET_method(connfd,uri);
         }
-         if(method!="GET"&&method!="POSt")
-         {
-             NOT_Implemented(method,connfd);
-         }
+        else if(method!="GET"&&method!="POSt")
+        {
+            NOT_Implemented(method,connfd);
+        }
+		else if(method=="POST")
+		{
+			if(uri != "/Post_show")
+			{
+				NOTFOUND_method(connfd);
+			}
+			else
+			{
+				NOT_Implemented(method,connfd);
+			}
+			
+		}
     }
 }
 
@@ -179,7 +198,6 @@ void TCP_connect(int thread_num,char *ip_address)
     server_address.sin_family = AF_INET; 
     server_address.sin_addr.s_addr = inet_addr(ip_address);  //sin_addr存储IP地址，使用in_addr这个数据结构；s_addr按照网络字节顺序存储IP地址
     server_address.sin_port = htons(server_port);   //端口号
- 
 
     if (bind(socketfd, (struct sockaddr *) &server_address,
         sizeof(server_address)) == -1) {
@@ -222,7 +240,7 @@ int main(int argc,char **argv)
     thread_num=2;
     ip_address="127.0.0.1";
 
-    if(argc < 0)
+    if(argc < 5)
     {
         printf("./httpServer --ip ip_address --port port_number [--number-thread thread_number] \n");
         exit(1);
@@ -256,6 +274,11 @@ int main(int argc,char **argv)
         }
     }
 
+<<<<<<< HEAD
     TCP_connect(thread_num,ip_address);
+=======
+    TCP_connect();
+
+>>>>>>> 88a0292d958836b934d80ff97ae2d088df8e7d10
     return 0;
 }
