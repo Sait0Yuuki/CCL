@@ -74,43 +74,95 @@ void GET_method(int connfd,std::string uri)
     curi++; //删除"/"
     int fd;
 
-    if(uri=="/") curi="index.html"; //默认消息体
-    fd = open(curi,O_RDONLY);
-    if(fd==-1) //找不到文件
-    {
-        NOTFOUND_method(connfd);
-    }
+	if(uri=="/Post_show")
+	{
+		curi="index.html"; //默认消息体
+		fd = open(curi,O_RDONLY);
+		if(fd==-1) //找不到文件
+		{
+			NOTFOUND_method(connfd);
+		}
 
-    //printf("send=%d\n",s);
-    
-    //获取文件大小
-    struct stat file;
-    stat(curi,&file);
-    int length=file.st_size;
-    std::string slength = std::to_string(length);
+		//printf("send=%d\n",s);
+		
+		//获取文件大小
+		struct stat file;
+		stat(curi,&file);
+		int length=file.st_size;
+		std::string slength = std::to_string(length);
 
-    //构造请求
-    char code[]="HTTP/1.1 200 OK\r\n";
-    char server[]="Server: Tiny Web Server\r\n";
-    char length_head[]="Content-length:";
-    char const *clength = slength.c_str(); 
-    char type_head[]="\r\nContent-type:";
-    char *type=http_get_mime_type(curi);
-    char end[]="\r\n\r\n";
-    
-    //发送响应
-    send(connfd,code,strlen(code),0);
-    send(connfd,server,strlen(server),0);
-    send(connfd,length_head,strlen(length_head),0);
-    send(connfd,clength,strlen(clength),0);
-    send(connfd,type_head,strlen(type_head),0);
-    send(connfd,type,strlen(type),0);
-    send(connfd,end,strlen(end),0);
+		//构造请求
+		char code[]="HTTP/1.1 200 OK\r\n";
+		char server[]="Server: Tiny Web Server\r\n";
+		char type_head[]="\r\nContent-type:";
+		char *type=http_get_mime_type(curi);
+		char length_head[]="Content-length:";
+		char const *clength = slength.c_str(); 
+		char end[]="\r\n\r\n";
+		
+		char html_title[]="<html><title>POST method</title><body bgcolor=ffffff>\r\n";
+		char name[]="Your name: HNU\r\n";
+		char ID[]="ID: CS06142\r\n";
+		char em[]="<hr><em>HTTP Web server</em>\r\n</body></html>\r\n\r\n";
 
-    sendfile(connfd,fd,NULL,2500);
+		//发送响应
+		send(connfd,code,strlen(code),0);
+		send(connfd,server,strlen(server),0);
+		send(connfd,length_head,strlen(length_head),0);
+		send(connfd,clength,strlen(clength),0);
+		send(connfd,type_head,strlen(type_head),0);
+		send(connfd,type,strlen(type),0);
+		send(connfd,end,strlen(end),0);
+		send(connfd,html_title,strlen(html_title),0);
+		send(connfd,name,strlen(name),0);
+		send(connfd,ID,strlen(ID),0);
+		send(connfd,em,strlen(em),0);
 
-    close(fd);
-    close(connfd);
+		// sendfile(connfd,fd,NULL,2500);
+
+		close(fd);
+		close(connfd);
+	}
+	else
+	{
+		if(uri=="/") curi="index.html"; //默认消息体
+		fd = open(curi,O_RDONLY);
+		if(fd==-1) //找不到文件
+		{
+			NOTFOUND_method(connfd);
+		}
+
+		//printf("send=%d\n",s);
+		
+		//获取文件大小
+		struct stat file;
+		stat(curi,&file);
+		int length=file.st_size;
+		std::string slength = std::to_string(length);
+
+		//构造请求
+		char code[]="HTTP/1.1 200 OK\r\n";
+		char server[]="Server: Tiny Web Server\r\n";
+		char length_head[]="Content-length:";
+		char const *clength = slength.c_str(); 
+		char type_head[]="\r\nContent-type:";
+		char *type=http_get_mime_type(curi);
+		char end[]="\r\n\r\n";
+		
+		//发送响应
+		send(connfd,code,strlen(code),0);
+		send(connfd,server,strlen(server),0);
+		send(connfd,length_head,strlen(length_head),0);
+		send(connfd,clength,strlen(clength),0);
+		send(connfd,type_head,strlen(type_head),0);
+		send(connfd,type,strlen(type),0);
+		send(connfd,end,strlen(end),0);
+
+		sendfile(connfd,fd,NULL,2500);
+
+		close(fd);
+		close(connfd);
+	}
 }
 
 void NOT_Implemented(std::string method,int fd)
@@ -131,6 +183,12 @@ void handle_request(char text[1024],int connfd)
     HttpRequestParser parser;
     int length=strlen(text);
 
+	
+	std::string str_text = "";
+	str_text += text;
+
+	std::cout << "\n\ndb db db: I am here here here. " << str_text << "\n";
+
     HttpRequestParser::ParseResult res = parser.parse(request, text, text + length);
 
     if( res == HttpRequestParser::ParsingCompleted )
@@ -147,16 +205,24 @@ void handle_request(char text[1024],int connfd)
         {
             GET_method(connfd,uri);
         }
-        else if(method!="GET"&&method!="POSt")
+        else if(method!="GET"&&method!="POST")
         {
             NOT_Implemented(method,connfd);
         }
 		else if(method=="POST")
 		{
-			if(uri != "/Post_show")
+			if( uri == "/Post_show")
+			{
+				GET_method(connfd,uri);
+				std::cout << "db db db: /Post_show\n";
+			}
+			else if(uri != "/Post_show")
 			{
 				NOTFOUND_method(connfd);
 			}
+
+			// for(vector<char>::iterator it=request)
+
 			else
 			{
 				NOT_Implemented(method,connfd);
