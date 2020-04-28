@@ -22,8 +22,17 @@ int server_port;
 void NOTFOUND_method(int connfd) //404
 {
     char code[]="HTTP/1.1 404 Not Found\r\n";
-    char content_type[]="Content-type: text/html";
+    char content_type[]="Content-type: text/html\r\n\r\n";
     char end[]="\r\n\r\n";
+    char entity1[]="<html><title>404 Not Found</title><body bgcolor=ffffff>\n Not Found\n";
+    char file[]="<p>Could not find this file: \n";
+    char entity2[]="<hr><em>HTTP Web Server</em>\n</body></html>\n";
+    send(connfd,code,strlen(code),0);
+    send(connfd,content_type,strlen(content_type),0);
+    send(connfd,entity1,strlen(entity1),0);
+    send(connfd,file,strlen(file),0);
+    send(connfd,entity2,strlen(entity2),0);
+    send(connfd,end,strlen(end),0);
     close(connfd);
 }
 
