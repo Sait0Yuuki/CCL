@@ -30,7 +30,7 @@ void NOTFOUND_method(std::string method,std::string url,int fd){
     if(method=="POST"){
         entity=entity1+entity2;
     }
-    std::string str="HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\nContent-Length: "+std::to_string(entity.length())+"\r\n\r\n";
+    std::string str="HTTP/1.1 404 Not Found\r\nServer: Tiny Web Server\r\nContent-Type: text/html\r\nContent-Length: "+std::to_string(entity.length())+"\r\n\r\n";
     std::string total=str+entity;
     char buf[512];
     sprintf(buf,"%s",total.c_str());
