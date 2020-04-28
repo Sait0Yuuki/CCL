@@ -22,11 +22,6 @@ int server_port;
 int thread_num;
 char *ip_address;
 
-void POST_method(int connfd, std::string rui)
-{
-	
-}
-
 void NOTFOUND_method(std::string method,std::string url,int fd){
     std::string entity1="<html><title>404 Not Found</title><body bgcolor=ffffff>\n Not Found\n";
     std::string file="<p>Could not find this file: "+url+"\n";
@@ -194,9 +189,6 @@ void handle_request(int connfd)
     {
         std::cout<<request.method<<std::endl;
         std::cout<<request.uri<<std::endl;
-        //method(GET OR POST)
-        //uri(/,/Post_show)
-        //content(e.g. Name=HNU&ID=CS06142)
 
         std::string method=request.method;
         std::string uri=request.uri;
