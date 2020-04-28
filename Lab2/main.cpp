@@ -15,9 +15,12 @@
 
 #include "httprequestparser.h"
 #include "request.h"
+#include "ThreadPool.h"
 using namespace httpparser;
 
 int server_port;
+int thread_num;
+char *ip_address;
 
 void NOTFOUND_method(int connfd) //404
 {
@@ -118,8 +121,12 @@ void NOT_Implemented(std::string method,int fd)
     write(fd, buf, strlen(buf));
 }
 
-void handle_request(char text[1024],int connfd)
+void handle_request(int connfd)
 {
+    char text[1024];
+    recv(connfd,text,1024,0);
+    text[strlen(text)+1]='\0';
+    
     Request request;
     HttpRequestParser parser;
     int length=strlen(text);
@@ -147,8 +154,10 @@ void handle_request(char text[1024],int connfd)
     }
 }
 
-void TCP_connect()
+void TCP_connect(int thread_num,char *ip_address)
 {
+    ThreadPool pool(thread_num);
+
     int socketfd;
     int connfd;
     struct sockaddr_in server_address;
@@ -168,7 +177,7 @@ void TCP_connect()
 
     bzero(&server_address,sizeof(server_address));    //清零
     server_address.sin_family = AF_INET; 
-    server_address.sin_addr.s_addr = htons(INADDR_ANY);  //sin_addr存储IP地址，使用in_addr这个数据结构；s_addr按照网络字节顺序存储IP地址
+    server_address.sin_addr.s_addr = inet_addr(ip_address);  //sin_addr存储IP地址，使用in_addr这个数据结构；s_addr按照网络字节顺序存储IP地址
     server_address.sin_port = htons(server_port);   //端口号
  
 
@@ -198,11 +207,7 @@ void TCP_connect()
         }
         else
         {
-            char request[1024];
-            recv(connfd,request,1024,0);
-            request[strlen(request)+1]='\0';
-
-            handle_request(request,connfd);
+          pool.enqueue(handle_request,connfd);
 
         }
     }
@@ -214,6 +219,8 @@ int main(int argc,char **argv)
 {
     //默认参数s
     server_port=8888;
+    thread_num=2;
+    ip_address="127.0.0.1";
 
     if(argc < 0)
     {
@@ -231,11 +238,24 @@ int main(int argc,char **argv)
             }
             server_port=atoi(server_port_str);
         }
-        /*else if..*/
+        else if (strcmp("--number-thread", argv[i]) == 0) 
+        {
+          char *cthread_num = argv[++i];
+          if (!cthread_num) {
+              fprintf(stderr, "Expected argument after --proxy\n");
+          }
+          thread_num=atoi(cthread_num);
+        }
+        else if (strcmp("--ip", argv[i]) == 0) 
+        {
+          char *ip = argv[++i];
+          if (!ip) {
+              fprintf(stderr, "Expected argument after --ip\n");
+          }
+          ip_address=ip;
+        }
     }
 
-    TCP_connect();
-
-	
+    TCP_connect(thread_num,ip_address);
     return 0;
 }
