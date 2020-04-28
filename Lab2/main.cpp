@@ -21,6 +21,9 @@ int server_port;
 
 void NOTFOUND_method(int connfd) //404
 {
+    char code[]="HTTP/1.1 404 Not Found\r\n";
+    char content_type[]="Content-type: text/html";
+    char end[]="\r\n\r\n";
     close(connfd);
 }
 
@@ -55,30 +58,37 @@ void GET_method(int connfd,std::string uri)
     curi++; //删除"/"
     int fd;
 
-    if(uri=="/") fd = open("index.html",O_RDONLY); //默认消息体
-    else
+    if(uri=="/") curi="index.html"; //默认消息体
+    fd = open(curi,O_RDONLY);
+    if(fd==-1) //找不到文件
     {
-        fd = open(curi,O_RDONLY);
-        if(fd==-1) //找不到文件
-        {
-            NOTFOUND_method(connfd);
-            return ;
-        }
+        NOTFOUND_method(connfd);
     }
 
     //printf("send=%d\n",s);
+    
+    //获取文件大小
+    struct stat file;
+    stat(curi,&file);
+    int length=file.st_size;
+    std::string slength = std::to_string(length);
+
     //构造请求
     char code[]="HTTP/1.1 200 OK\r\n";
     char server[]="Server: Tiny Web Server\r\n";
-    char content_typehead[]="Content-type:";
-    char *content_type=http_get_mime_type(curi);
+    char length_head[]="Content-length:";
+    char const *clength = slength.c_str(); 
+    char type_head[]="\r\nContent-type:";
+    char *type=http_get_mime_type(curi);
     char end[]="\r\n\r\n";
     
     //发送响应
     send(connfd,code,strlen(code),0);
     send(connfd,server,strlen(server),0);
-    send(connfd,content_typehead,strlen(content_typehead),0);
-    send(connfd,content_type,strlen(content_type),0);
+    send(connfd,length_head,strlen(length_head),0);
+    send(connfd,clength,strlen(clength),0);
+    send(connfd,type_head,strlen(type_head),0);
+    send(connfd,type,strlen(type),0);
     send(connfd,end,strlen(end),0);
 
     sendfile(connfd,fd,NULL,2500);
@@ -86,7 +96,6 @@ void GET_method(int connfd,std::string uri)
 
     close(fd);
     close(connfd);
-    delete [] curi;
 }
 
 void handle_request(char text[1024],int connfd)
