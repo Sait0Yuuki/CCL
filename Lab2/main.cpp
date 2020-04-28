@@ -24,11 +24,36 @@ void NOTFOUND_method(int connfd) //404
     close(connfd);
 }
 
+//获取文件类型
+char *http_get_mime_type(char *file_name) {
+  char *file_extension = strrchr(file_name, '.');
+  if (file_extension == NULL) {
+    return "text/plain";
+  }
+
+  if (strcmp(file_extension, ".html") == 0 || strcmp(file_extension, ".htm") == 0) {
+    return "text/html";
+  } else if (strcmp(file_extension, ".jpg") == 0 || strcmp(file_extension, ".jpeg") == 0) {
+    return "image/jpeg";
+  } else if (strcmp(file_extension, ".png") == 0) {
+    return "image/png";
+  } else if (strcmp(file_extension, ".css") == 0) {
+    return "text/css";
+  } else if (strcmp(file_extension, ".js") == 0) {
+    return "application/javascript";
+  } else if (strcmp(file_extension, ".pdf") == 0) {
+    return "application/pdf";
+  } else {
+    return "text/plain";
+  }
+}
+
 void GET_method(int connfd,std::string uri)
 {
+    char *curi = new char[uri.length() + 1];
+    strcpy(curi, uri.c_str());
+    curi++; //删除"/"
     int fd;
-    const char *curi = uri.c_str();
-    curi++; //去掉"/"
 
     if(uri=="/") fd = open("index.html",O_RDONLY); //默认消息体
     else
@@ -42,12 +67,26 @@ void GET_method(int connfd,std::string uri)
     }
 
     //printf("send=%d\n",s);
-    char buf[520]="HTTP/1.1 200 OK\r\nServer: Tiny Web Server\r\nContent-type: text/html\r\n\r\n";//HTTP响应
-    int s = send(connfd,buf,strlen(buf),0);//发送响应
-    sendfile(connfd,fd,NULL,2500);//零拷贝发送消息体
+    //构造请求
+    char code[]="HTTP/1.1 200 OK\r\n";
+    char server[]="Server: Tiny Web Server\r\n";
+    char content_typehead[]="Content-type:";
+    char *content_type=http_get_mime_type(curi);
+    char end[]="\r\n\r\n";
+    
+    //发送响应
+    send(connfd,code,strlen(code),0);
+    send(connfd,server,strlen(server),0);
+    send(connfd,content_typehead,strlen(content_typehead),0);
+    send(connfd,content_type,strlen(content_type),0);
+    send(connfd,end,strlen(end),0);
+
+    sendfile(connfd,fd,NULL,2500);
+    
 
     close(fd);
     close(connfd);
+    delete [] curi;
 }
 
 void handle_request(char text[1024],int connfd)
