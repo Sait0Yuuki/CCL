@@ -106,6 +106,17 @@ void GET_method(int connfd,std::string uri)
     close(fd);
     close(connfd);
 }
+void NOT_Implemented(std::string method,int fd)
+{
+    std::string entity1="<html><title>501 Not Implemented</title><body bgcolor=ffffff>\n Not Implemented\n";
+    std::string entity2="<p>Does not implement this method: "+method+"\n<hr><em>HTTP Web Server</em>\n</body></html>\n";
+    std::string entity=entity1+entity2;
+    std::string str="HTTP/1.1 501 Not Implemented\r\nContent-Type: text/html\r\nContent-Length: "+std::to_string(entity.length())+"\r\n\r\n";
+    std::string total=str+entity;
+    char buf[512];
+    sprintf(buf,"%s",total.c_str());
+    write(fd, buf, strlen(buf));
+}
 
 void handle_request(char text[1024],int connfd)
 {
@@ -129,6 +140,10 @@ void handle_request(char text[1024],int connfd)
         {
             GET_method(connfd,uri);
         }
+         if(method!="GET"&&method!="POSt")
+         {
+             NOT_Implemented(method,connfd);
+         }
     }
 }
 
