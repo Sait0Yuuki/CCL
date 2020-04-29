@@ -337,7 +337,6 @@ int main(int argc,char **argv)
     if(argc < 5)
     {
         printf("./httpServer --ip ip_address --port port_number [--number-thread thread_number] \n");
-        exit(1);
     }
 
     for(int i=1;i<argc;i++)
