@@ -22,6 +22,36 @@ int server_port;
 int thread_num;
 char *ip_address;
 
+void POST_method(std::string Name, std::string ID, int connfd,std::string str_text)
+{
+    std::string str_send = "";
+    char OK[]="HTTP/1.1 200 OK\r\n";
+    str_send += OK;
+    char server[]="Tiny Web Server\r\n";
+    str_send += server;
+    char Context_type[]="text/html\r\n";
+    str_send += Context_type;
+    // char Context_len[]="Context_length:";
+
+  	char html_title[]="<html><title>POST Method</title><body bgcolor=ffffff>\n";
+    str_send += html_title;
+    char chName[]="Your Name: ";
+    str_send += chName;
+    str_send += Name;
+    char chID[]="ID: ";
+    str_send += chID;
+    str_send += ID;
+		char web[]="<hr><em>Http Web Server</em>\n</body></html>\n";
+    str_send += web;
+	
+    char send_buf[1024];
+    sprintf(send_buf,"%s",str_send.c_str());
+    write(connfd, send_buf, strlen(send_buf));
+
+		// close(fd);
+		close(connfd);
+}
+
 void NOTFOUND_method(std::string method,std::string url,int fd){
     std::string entity1="<html><title>404 Not Found</title><body bgcolor=ffffff>\n Not Found\n";
     std::string file="<p>Could not find this file: "+url+"\n";
@@ -179,6 +209,9 @@ void handle_request(int connfd)
     recv(connfd,text,1024,0);
     text[strlen(text)+1]='\0';
     
+    std::string str_text = "";
+    str_text += text;
+
     Request request;
     HttpRequestParser parser;
     int length=strlen(text);
@@ -204,8 +237,23 @@ void handle_request(int connfd)
 		{
 			if( uri == "/Post_show")
 			{
-				GET_method(method,connfd,uri);
-				std::cout << "db db db: /Post_show\n";
+        int position1 = str_text.find("Name=");
+        int position2 = str_text.find("&ID=");
+        if( position1==-1 || position2==-1 || position1>=position2)
+        {
+          NOTFOUND_method(method,uri,connfd);
+        }
+        else
+        {
+          GET_method(method,connfd,uri);
+				  std::cout << "db db db: /Post_show\n";
+        }
+				
+        std::string Name,ID;
+        Name=str_text.substr(position1+5,position2-position1-5);
+        ID=str_text.substr(position2+4);
+        POST_method(Name, ID, connfd, str_text);
+
 			}
 			if(uri != "/Post_show")
 			{
